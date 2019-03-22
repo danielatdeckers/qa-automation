@@ -1,0 +1,1 @@
+START /MIN CMD.EXE /C qa-automation.bat

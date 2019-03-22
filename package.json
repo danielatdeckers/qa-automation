@@ -1,0 +1,15 @@
+{
+  "name": "qa-run-scripts",
+  "version": "0.0.1",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "python ./src/server/server.py"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "electron": "^4.1.1"
+  }
+}
