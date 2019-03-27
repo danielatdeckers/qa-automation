@@ -1,22 +1,20 @@
 import random
-
-def init():
-    _tokenManager = _TokenManager()
+import string
 
 def compare(token):
-    return _tokenManager.compareToken(token)
+    if token == getToken():
+        return True
+    return False
 
-class _TokenManager(object):
-    def __init__(self):
-        self.token = self._getToken()
-
-    def compareToken(self, token):
-        if token == self._getToken():
-            return True
-        return False
-
-    def _getToken(self):
-        self._resetToken()
+def getToken():
+    #? Get Token From File
+    tokenfile = open("./src/scripts/core/script.token", "r")
+    token = tokenfile.read()
+    resetToken()
+    return token
     
-    def _resetToken(self):
-        pass
+def resetToken():
+    #? Reset Token In File
+    tokenString = ''.join([random.choice(string.ascii_letters + string.digits) for n in range(32)])
+    tokenfile = open("./src/scripts/core/script.token", "w")
+    tokenfile.write(tokenString)
