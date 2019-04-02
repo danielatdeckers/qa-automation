@@ -1,6 +1,10 @@
 import random
 import string
 
+def init():
+    open("./src/scripts/core/script.token", "w+").close()
+    getToken()
+
 def compare(token):
     if token == getToken():
         return True
