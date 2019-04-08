@@ -1,1 +1,1 @@
-npm test
+python ./src/server/server.py
