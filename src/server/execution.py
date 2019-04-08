@@ -1,38 +1,40 @@
-import os
-import subprocess
-from config import configManager
+import os, subprocess
 
+from config import configManager
 
 class ScriptManager(object):
     def __init__(self):
-        self.scriptData = {}
-        self.executionTimeout = 10
+        self.scriptArray = {}
+        self.macroConfig = {}
+        self.results = {}
         self.refresh()
+    
+    def add(self, scriptName = "", args = ""):
+        scriptCommand = None
+        for script in self.scriptArray:
+            if script["name"] == scriptName:
+                scriptCommand = script["execution"]
+        if scriptCommand != None:
+            process = subprocess.Popen("{} {}".format(scriptCommand, args).split(" "))
+
+        try:
+            process.wait(timeout = self.macroConfig["timeout"])
+        except:
+            process.kill()
+
+    def setResult(self, scriptName, result = ""):
+        self.results[scriptName] = result
+
+    def getResult(self, scriptName):
+        if scriptName in self.results:
+            result = self.results[scriptName]
+            self.results.pop(scriptName, None)
+            return result
+        return 404
 
     def refresh(self):
         configManager.refresh()
         config = configManager.getConfig()
-        self.scriptData = config["scripts"]
-        self.executionTimeout = config["executionTimeout"]
+        self.macroConfig = config["macro-config"]
+        self.scriptArray = config["scripts"]
     
-    def shutdown(self, process):
-        try:
-            process.wait(timeout = self.executionTimeout)
-        except Exception:
-            process.terminate()
-
-    def run(self, scriptName = "", args = [""]):
-        return self.runHelper(scriptName, args)
-
-    def runHelper(self, scriptName = "", args = [""]):
-        for script in self.scriptData:
-            if script["name"] == scriptName:
-                
-                scriptCommand = " ".join(script["execution"].split(" ") + args)
-                newProcess = subprocess.Popen(scriptCommand, shell = False)
-                self.shutdown(newProcess)
-                return 200
-        return 404
-
-    def result(self, scriptName, result = ""):
-        pass

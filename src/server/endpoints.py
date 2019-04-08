@@ -1,65 +1,56 @@
-import cherrypy
-
 import api
-from api import RequestHandler
-from execution import ScriptManager
+import execution
+import client
 
-
-scriptManager = ScriptManager()
+scriptManager = execution.ScriptManager()
 api.init()
+client.init()
 
 def init():
-    cherrypy.tree.mount(FrontEnd(), '/', 'src/client.conf')
-    cherrypy.tree.mount(UserAPI(), '/api/user', 'src/api.conf')
-    cherrypy.tree.mount(ScriptAPI(), '/api/script', 'src/api.conf')
+    client.group(FrontEnd(), "/")
+    api.group(UserAPI(), "/api/user")
+    api.group(ScriptAPI(), "/api/script")
 
 class FrontEnd(object):
-    @cherrypy.expose
+    @client.endpoint
     def index(self):
-        #* Angular Frontend
         return open("src/public/index.html")
 
 class UserAPI(object):
     @api.endpoint
     def result(self, scriptName=""):
-        with RequestHandler("GET", False) as requestResult:
-            return {"Request": "yep"}
+        with api.Request("GET", False) as (authorized, status):
+            if authorized:
+                result = scriptManager.getResult(scriptName)
+                status(result)
+                return result
 
     @api.endpoint
     def run(self, scriptName="", scriptParams={}, args = ""):
-        with RequestHandler("POST", False) as requestResult:
-            if requestResult[0]:
-                result = scriptManager.run(scriptName)
-                if result != 200:
-                    requestResult[1](result)
-                else:
-                    return {"Result":"Completed"}
+        with api.Request("POST", False) as (authorized, status):
+            if authorized:
+                scriptManager.add(scriptName)
+                return {"Result":"Completed"}
 
 class ScriptAPI(object):
     @api.endpoint
-    def params(self, scriptName=""):
-        with RequestHandler("GET", True) as requestResult:
-            return {"Request": "yep"}
+    def run(self, scriptName="", args = ""):
+        with api.Request("POST", True) as (authorized, status):
+            if authorized:
+                scriptManager.add(scriptName)
+                return {"Result":"Completed"}
 
     @api.endpoint
-    def run(self, scriptName="", scriptParams={}, args = ""):
-        with RequestHandler("POST", True) as requestResult:
-            if requestResult[0]:
-                result = scriptManager.run(scriptName)
-                if result != 200:
-                    requestResult[1](result)
-                else:
-                    return {"Result":"Completed"}
-
-    @api.endpoint
-    def results(self, scriptName="", scriptResults={}):
-        with RequestHandler("PUT", True) as requestResult:
-            return {"Request": "yep"}
+    def result(self, scriptName="", scriptResults={}):
+        with api.Request("GET", False) as (authorized, status):
+            if authorized:
+                scriptManager.setResult(scriptName, scriptResults)
+                return {"Result":"Completed"}
     
     @api.endpoint
     def update(self):
-        with RequestHandler("GET", False) as requestResult:
-            if requestResult[0]:
+        with api.Request("GET", False) as (authorized, status):
+            if authorized:
                 scriptManager.refresh()
                 api.refresh()
-                return {"Request": "yep"}
+                return {"Result":"Completed"}

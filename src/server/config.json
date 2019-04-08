@@ -2,40 +2,38 @@
     "error":{
         "errorManagement": {
             "400": {
-                "message": "<h1>Bad Request</h1>",
+                "message": "<h1>400: Bad Request</h1>",
                 "type": "text/html"
             },
             "401": {
-                "message": "<h1>Not Authorized</h1>",
+                "message": "<h1>401: Not Authorized</h1>",
                 "type": "text/html"
             },
             "404": {
-                "message": "<h1>Does Not Exist!!!!!!</h1>",
+                "message": "<h1>404: Does Not Exist!!!!!!</h1>",
                 "type": "text/html"
             },
             "500": {
-                "message": "<h1>Opps! A problem has occured</h1>",
+                "message": "<h1>500: Opps! A problem has occured</h1>",
                 "type": "text/html"
             }
         },
         "fallback": {
-            "message":"<h1>Don't Panic!</h1>",
+            "message":"<h1>Don't Panic!</h1><h2>Unknown Error</h2>",
             "type": "text/html"
         }
     },
     "scripts": [
         {
             "name": "endlessTest",
-            "execution": "python src/scripts/test_endless.py",
-            "hasResult": true,
-            "singleExecution": true
+            "execution": "python src/scripts/test_endless.py"
         },
         {
             "name": "limitedTest",
-            "execution": "python src/scripts/test_limited.py",
-            "hasResult": true,
-            "singleExecution": true
+            "execution": "python src/scripts/test_limited.py"
         }
     ],
-    "executionTimeout": 20
+    "macro-config": {
+        "timeout": 20
+    }
 }
